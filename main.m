@@ -26,7 +26,7 @@
 % 
 %Problem 2
 ratioList = [];
-for i = 1:10
+parfor i = 1:10
     M2 = ceil(9*rand(9,9));
     result2 = solveSudoku(M2,3);
     ratio = errorRatio(result2,M2);
