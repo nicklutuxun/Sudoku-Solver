@@ -72,13 +72,22 @@ function output = solveSudoku(M,dim)
   end
 
   % Solve Integer Linear Programming
-  intcon = 1:numVariable;
-  options = optimoptions('intlinprog','Display','none','IntegerTolerance',1e-5);
-  [xopt, ~] = intlinprog(-f,intcon,[],[],A,b,zeros(numVariable,1),ones(numVariable,1),[],options);
-  
+%   intcon = 1:numVariable;
+%   options = optimoptions('intlinprog','Display','none','IntegerTolerance',1e-5);
+%   [xopt, ~] = intlinprog(-f,intcon,[],[],A,b,zeros(numVariable,1),ones(numVariable,1),[],options);
+  model.obj = -f;
+  model.lb = zeros(numVariable,1);
+  model.ub = ones(numVariable,1);
+  model.vtype = repmat('B', numVariable, 1);
+  model.A = sparse(A);
+  model.rhs = b;
+  model.sense = repmat('=', numConstraint, 1);
+  params.outputflag = 0;
+  result = gurobi(model, params);
+
   % Put solution into M
   for i = 1:numVariable
-    if abs(1-xopt(i,1)) <= 10^(-6) 
+    if abs(1-result.x(i,1)) <= 10^(-6) 
       [row, col, value] = IndexToijm(i,dim);
       output(row, col) = value;
     end
